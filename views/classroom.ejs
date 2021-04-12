@@ -1,0 +1,117 @@
+<%- include('partials/header.ejs') %>
+<style>
+.main,body,html {
+  margin: 0px;
+  padding:0;
+  overflow:hidden;
+}
+video {
+  height: calc(100vh);
+  width: 100vw;
+  display:block;
+  object-fit: cover;
+}
+</style>
+
+<div class="main">
+  <div id="host-video"></div>
+  <div id="video-grid"></div>
+</div>
+<%- include('partials/scripts.ejs') %> 
+<script>
+  const ROOM_ID = "<%= roomId %>"
+  const roomData = JSON.parse('<%- JSON.stringify(room) %>')
+  let clientData = null
+
+  if (localStorage.getItem('session')) {
+    try {
+      clientData = JSON.parse(localStorage.getItem('session'))
+    } catch(e) {
+      clientData = null
+    }
+  }
+  
+  document.addEventListener('DOMContentLoaded', e => {
+    const socket = io('/')
+    const videoGrid = document.getElementById('video-grid')
+    const localPeer = new Peer()
+    const peers = {}
+
+    const host = document.querySelector('#host-video')
+
+    const localVideo = document.createElement('video')
+    localVideo.muted = true
+
+    function addVideoStream(video, stream, target = 'common') {
+      video.srcObject = stream
+      video.addEventListener('loadedmetadata', () => {
+        video.play()
+      })
+
+      if (target !== 'common') {
+        host.append(video)
+      } else {
+        videoGrid.append(video)
+      }
+    }
+
+    function connectToRemotePeer(data, stream) {
+      const call = localPeer.call(data.offer, stream)
+      const video = document.createElement('video')
+
+      call.on('stream', remoteStream => {
+        if (!clientData) {
+          if (data.roomData.client) {
+            addVideoStream(video, remoteStream)
+          }
+        }
+      })
+      call.on('close', () => {
+        console.log('closed')
+        video.remove()
+      })
+
+      peers[data.offer] = call
+    }
+
+    /**
+     * Join the room
+     */
+    localPeer.on('open', offer => {
+      Object.assign(roomData, {
+        client: clientData
+      })
+      socket.emit('userJoinRoom', {roomData, offer})
+    })
+
+    navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true
+    }).then(stream => {
+      if (clientData) {
+        addVideoStream(localVideo, stream)
+      }
+
+      localPeer.on('call', call => {
+        call.answer(stream)
+        const video = document.createElement('video')
+        
+        call.on('stream', localStream => {
+          if (!clientData) {
+            addVideoStream(video, localStream)
+          }
+        })
+
+        call.on('close', () => {
+          video.remove()
+        })
+      })
+
+      socket.on('userJoinedRoom', data => {
+        connectToRemotePeer(data, stream)
+      })
+    })
+  })
+</script>
+</body>
+</html>

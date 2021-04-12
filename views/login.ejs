@@ -1,0 +1,80 @@
+<%- include('partials/header.ejs') %>
+<style>
+.main {
+  display: flex;
+  justify-content: center;
+  height: calc(90vh - 30px);
+  flex-direction: column;
+  align-items: center;
+}
+.login-form-wrapper {
+  max-width: 320px;
+  margin: auto;
+}
+.form-group {
+  margin: 10px 0px;
+}
+.form-footer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+</style>
+
+<div class="main">
+  <div class="col-md-6 col-sm-12">
+    <div class="login-form-wrapper">
+      <form id="login-form">
+        <div id="error" class="alert alert-danger hide">
+          Password or username mismatch.
+        </div>
+        <b>Login</b>
+        <div class="form-group">
+          <label>User Name</label>
+          <input type="text" id="username" class="form-control" placeholder="Username" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="password" class="form-control" placeholder="Password" required>
+        </div>
+
+        <div class="form-footer">
+          <button type="submit" class="btn btn-primary">Login</button>
+          <a href="/register" class="button" class="btn btn-secondary">Register</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<%- include('partials/scripts.ejs') %> 
+<script>
+document.addEventListener('DOMContentLoaded', function(e) {
+  const form = document.querySelector('#login-form')
+  const formData = {}
+  const inputs = form.querySelectorAll('input')
+  const errorAlert = form.querySelector('#error')
+
+  form.addEventListener('submit', function(ev) {
+    errorAlert.classList.add('hide')
+    ev.preventDefault()
+    for (field of inputs) {
+      formData[field.id] = field.value
+    }
+
+    fetchData('/login', 'POST', formData).then(response => {
+      if (!response.success) {
+        errorAlert.classList.remove('hide')
+        return
+      }
+      localStorage.removeItem('session')
+      localStorage.setItem('session', JSON.stringify(response.data))
+      window.location.href = '/home'
+    }).catch(error => {
+      console.log(error)
+    })
+  })
+})
+</script>
+
+<%- include('partials/footer.ejs') %>

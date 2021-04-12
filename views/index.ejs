@@ -1,0 +1,56 @@
+<%- include('partials/header.ejs') %> 
+
+<section id="hero" class="hero d-flex align-items-center">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6">
+        <form method="post" id="classroom-form" enctype="multipart/form-data">
+          <div class="row gy-4">
+            <div class="col-md-6">
+              <input value="text" type="text" id="name" name="name" class="form-control" placeholder="Your Name" required="">
+            </div>
+
+            <div class="col-md-6 ">
+              <input value="text" type="text" id="phone" class="form-control" name="phone" placeholder="Your Phone" required="">
+            </div>
+
+            <div class="col-md-12">
+              <input value="text" type="text" id="class" class="form-control" name="class" placeholder="Class" required="">
+            </div>
+
+            <div class="col-md-6">
+              <input value="text" type="text" id="subject" class="form-control" name="subject" placeholder="Subject" required="">
+            </div>
+            <div class="col-md-6">
+              <input value="text" type="text" id="topic" class="form-control" name="topic" placeholder="Topic" required="">
+            </div>
+
+            <div class="col-md-12">
+              <textarea id="description" class="form-control" name="description" rows="6" placeholder="Class description" required="">a</textarea>
+            </div>
+
+            <div class="col-md-12 text-center">
+              <button type="submit" class="btn-get-started d-inline-flex align-items-center justify-content-center align-self-center">Create Class</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="col-lg-6 d-flex flex-column justify-content-center">
+        <div data-aos="fade-up" data-aos-delay="600">
+          <div class="text-center text-lg-start">
+            <button class="btn-get-started scrollto d-inline-flex align-items-center justify-content-center align-self-center">
+              <span>Create Classroom</span>
+              <i class="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 hero-img" data-aos="zoom-out" data-aos-delay="200">
+        <img src="/assets/img/pricing-free.png" class="img-fluid" alt="">
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer.ejs') %> 
